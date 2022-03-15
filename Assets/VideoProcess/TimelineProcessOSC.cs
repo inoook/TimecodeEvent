@@ -31,13 +31,13 @@ public class TimelineProcessOSC : MonoBehaviour
 
     void SendOsc(string address, float timeSec, params object[] values)
     {
-        logGui.AddLog($"{timeSec.ToString("0.00")} sec > osc: {address} [{string.Join(",", values)}]");
+        logGui.AddLog($"send: {timeSec.ToString("0.00")} sec > osc: {address} [{string.Join(",", values)}]");
         oscSender.Send(address, values);
     }
 
     public void DrawGUI()
     {
         GUILayout.Label(this.gameObject.name);
-        GUILayout.Label($"{oscSender.address} : {oscSender.port}");
+        GUILayout.Label($"Timecode event OSC送信先 [ {oscSender.address} : {oscSender.port} ]");
     }
 }

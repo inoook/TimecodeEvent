@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Video;
 
+/// <summary>
+/// 動画を再生し、動画の再生時間に合わせて、oscJsonで指定されたTimecodeでOSCコマンドの送信を行う
+/// </summary>
 public class VideoTimeCodePresenter : MonoBehaviour
 {
     // -----
@@ -92,6 +95,8 @@ public class VideoTimeCodePresenter : MonoBehaviour
 
     [SerializeField] int currentId = 0;
 
+    [SerializeField] SceneSelectInput input = null;
+
     // Start is called before the first frame update
     void Awake()
     {
@@ -101,27 +106,32 @@ public class VideoTimeCodePresenter : MonoBehaviour
         {
             ApplyAppSetting(appSetting);
         }
-
-
     }
 
     private void Start()
     {
-        // apply setting
+        input.eventSelectScene += (id) =>
+        {
+            SetContent(id);
+        };
+
         SetContent(currentId);
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            Application.Quit();
-        }
+        //if (Input.GetKeyDown(KeyCode.Escape))
+        //{
+        //    Application.Quit();
+        //}
     }
 
-
-    void SetContent(int id)
+    public void SetContent(int id)
     {
+        if(id >= appSetting.contents.Length) {
+            Debug.LogWarning($"{id} が存在しません");
+            return; }
+
         currentId = id;
         Content content = appSetting.contents[id];
 
@@ -143,22 +153,15 @@ public class VideoTimeCodePresenter : MonoBehaviour
 
     public void DrawGUI()
     {
+        timelineProcessOSC.DrawGUI();
+
         for (int i =0; i < appSetting.contents.Length; i++) {
-            if (GUILayout.Button($"{appSetting.contents[i].videoFile}"))
+            Content content = appSetting.contents[i];
+            if (GUILayout.Button($"{content.videoFile}  / {content.oscJson}"))
             {
                 SetContent(i);
             }
         }
     }
 
-    [SerializeField] Rect drawRect = new Rect(300,10,300,300);
-    private void OnGUI()
-    {
-        GUILayout.BeginArea(drawRect);
-
-        timelineProcessOSC.DrawGUI();
-
-        DrawGUI();
-        GUILayout.EndArea();
-    }
 }
